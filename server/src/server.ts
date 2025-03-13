@@ -36,7 +36,14 @@ const startApolloServer = async () => {
     app.use(
       "/graphql",
       expressMiddleware(server as any, {
-        context: authenticateToken as any,
+        context: async (contextParams) => {
+          try {
+            return await authenticateToken(contextParams);
+          } catch (error) {
+            console.error("Authentication error:", error);
+            throw error;
+          }
+        },
       })
     );
 

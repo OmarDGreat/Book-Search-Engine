@@ -1,13 +1,18 @@
 import { jwtDecode } from "jwt-decode";
 
 interface UserToken {
-  name: string;
+  data: {
+    _id: string;
+    username: string;
+    email: string;
+  };
   exp: number;
 }
 
 class AuthService {
   getProfile() {
-    return jwtDecode(this.getToken() || "");
+    const token = this.getToken();
+    return token ? jwtDecode<UserToken>(token).data : null;
   }
 
   loggedIn() {
@@ -21,10 +26,10 @@ class AuthService {
       if (decoded.exp < Date.now() / 1000) {
         return true;
       }
-
       return false;
     } catch (err) {
-      return false;
+      console.error("Token decode error:", err);
+      return true;
     }
   }
 
